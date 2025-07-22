@@ -8,19 +8,25 @@ interface item {
 interface CellItemProps {
   CellSelected: (item: item) => void
   value: item,
+  XDanger: number,
+  YDanger: number,
   XData: item[]
   YData: item[]
 }
 function CellItem(props: CellItemProps) {
-  const { CellSelected, value, XData, YData } = props
+  const { CellSelected, value, XData, YData, XDanger, YDanger } = props
   return (
-    <td onClick={() => CellSelected(value)} className={'h-28 border border-zinc-400 hover:bg-zinc-700 transition-colors duration-200 cursor-pointer '+ (((XData[0].coordinatesX == value.coordinatesX && XData[0].coordinatesY == value.coordinatesY) && XData[2].coordinatesX!= null) && "opacity-25")}><p className='mx-auto w-7 h-7'>
-      {XData.some(item =>
-        JSON.stringify(item) === JSON.stringify(value)
-      ) ? "X" : YData.some(item =>
-        JSON.stringify(item) === JSON.stringify(value)
-      ) ? "Y" : "-"}
-    </p></td>
+    <td onClick={() => CellSelected(value)} className={(XData.some(item =>
+      JSON.stringify(item) === JSON.stringify(value)
+    ) ? "text-blue-500" : YData.some(item =>
+      JSON.stringify(item) === JSON.stringify(value)
+    ) ? "text-pink-600" : "-") + ' h-28 border border-zinc-400 hover:bg-zinc-700 transition-colors duration-200 cursor-pointer ' + ((((XData[XDanger].coordinatesX == value.coordinatesX && XData[XDanger].coordinatesY == value.coordinatesY) && XData[2].coordinatesX != null) || ((YData[YDanger].coordinatesX == value.coordinatesX && YData[YDanger].coordinatesY == value.coordinatesY) && YData[2].coordinatesX != null)) && "opacity-50")}><p className='poppins-bold text-4xl mx-auto w-7 h-7'>
+        {XData.some(item =>
+          JSON.stringify(item) === JSON.stringify(value)
+        ) ? "X" : YData.some(item =>
+          JSON.stringify(item) === JSON.stringify(value)
+        ) ? "O" : "-"}
+      </p></td>
   )
 }
 function App() {
@@ -28,6 +34,8 @@ function App() {
   const [Y, setY] = useState<item[]>([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
   const [XIndex, setXIndex] = useState<number>(0)
   const [YIndex, setYIndex] = useState<number>(0)
+  const [XDanger, setXDanger] = useState<number>(0)
+  const [YDanger, setYDanger] = useState<number>(0)
   const [Turn, setTurn] = useState("X")
   const CellSelected = (item: item) => {
     if (X.some(Xdata =>
@@ -44,6 +52,13 @@ function App() {
 
     if (Turn == "X") {
       if (XIndex < 3) {
+        if (XDanger != 0) {
+          if (XDanger != 2) {
+            setXDanger(XDanger + 1)
+          } else {
+            setXDanger(0)
+          }
+        }
         const dataX = X
         dataX[XIndex] = item
         setX(dataX)
@@ -53,10 +68,22 @@ function App() {
         dataX[0] = item
         setX(dataX)
         setXIndex(1)
+        if (XDanger != 2) {
+          setXDanger(XDanger + 1)
+        } else {
+          setXDanger(0)
+        }
       }
       setTurn("Y")
     } else {
       if (YIndex < 3) {
+        if (YDanger != 0) {
+          if (YDanger < 3) {
+            setYDanger(YDanger + 1)
+          } else {
+            setYDanger(0)
+          }
+        }
         const dataY = Y
         dataY[YIndex] = item
         setY(dataY)
@@ -66,6 +93,11 @@ function App() {
         dataY[0] = item
         setY(dataY)
         setYIndex(1)
+        if (YDanger < 3) {
+          setYDanger(YDanger + 1)
+        } else {
+          setYDanger(0)
+        }
       }
       setTurn("X")
     }
@@ -77,48 +109,55 @@ function App() {
   return (
     <>
       <div className="flex w-full justify-between">
-        <div>
-          X data
-          <p>
-            {X[0].coordinatesX},{X[0].coordinatesY}
-          </p>
-          <p>
-            {X[1].coordinatesX},{X[1].coordinatesY}
-          </p>
-          <p>
-            {X[2].coordinatesX},{X[2].coordinatesY}
-          </p>
-        </div>
-        <div>
-          Y data
-          <p>
-            {Y[0].coordinatesY},{Y[0].coordinatesY}
-          </p>
-          <p>
-            {Y[1].coordinatesY},{Y[1].coordinatesY}
-          </p>
-          <p>
-            {Y[2].coordinatesY},{Y[2].coordinatesY}
-          </p>
+        <div className="flex flex-col w-full">
+          <p>XDanger: {XDanger}</p>
+          <p>YDanger: {YDanger}</p>
+          <br />
+          <div className='flex w-full justify-around mb-3'>
+            <div>
+              X data
+              <p>
+                {X[0].coordinatesX},{X[0].coordinatesY}
+              </p>
+              <p>
+                {X[1].coordinatesX},{X[1].coordinatesY}
+              </p>
+              <p>
+                {X[2].coordinatesX},{X[2].coordinatesY}
+              </p>
+            </div>
+            <div>
+              Y data
+              <p>
+                {Y[0].coordinatesY},{Y[0].coordinatesY}
+              </p>
+              <p>
+                {Y[1].coordinatesY},{Y[1].coordinatesY}
+              </p>
+              <p>
+                {Y[2].coordinatesY},{Y[2].coordinatesY}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <table className="table-auto w-80">
 
         <tbody className=''>
           <tr>
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 0 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 0 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 0 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 0 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 0 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 0 }} />
           </tr>
           <tr>
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 1 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 1 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 1 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 1 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 1 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 1 }} />
           </tr>
           <tr>
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 2 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 2 }} />
-            <CellItem XData={X} YData={Y} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 2 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 2 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 2 }} />
+            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 2 }} />
           </tr>
 
         </tbody>
