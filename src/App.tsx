@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Tooltip } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 interface item {
   coordinatesX: number | null
   coordinatesY: number | null
@@ -21,7 +22,7 @@ function CellItem(props: CellItemProps) {
       JSON.stringify(item) === JSON.stringify(value)
     ) ? "text-blue-500" : YData.some(item =>
       JSON.stringify(item) === JSON.stringify(value)
-    ) ? "text-pink-600" : "-") + ' h-[5.5rem] rounded-2xl bg-neutral-800 hover:bg-zinc-600 transition-colors duration-200 cursor-pointer ' + ((((XData[XDanger].coordinatesX == value.coordinatesX && XData[XDanger].coordinatesY == value.coordinatesY) && XData[2].coordinatesX != null) || ((YData[YDanger].coordinatesX == value.coordinatesX && YData[YDanger].coordinatesY == value.coordinatesY) && YData[2].coordinatesX != null)) && "opacity-50")}><p className='poppins-bold text-4xl mx-auto w-7 h-7'>
+    ) ? "text-pink-500" : "-") + ' h-[5.5rem] rounded-2xl bg-neutral-800 hover:bg-zinc-600 transition-colors duration-200 cursor-pointer ' + ((((XData[XDanger].coordinatesX == value.coordinatesX && XData[XDanger].coordinatesY == value.coordinatesY) && XData[2].coordinatesX != null) || ((YData[YDanger].coordinatesX == value.coordinatesX && YData[YDanger].coordinatesY == value.coordinatesY) && YData[2].coordinatesX != null)) && "opacity-50")}><p className='poppins-bold text-4xl mx-auto w-7 h-7'>
         {XData.some(item =>
           JSON.stringify(item) === JSON.stringify(value)
         ) ? "X" : YData.some(item =>
@@ -202,15 +203,15 @@ function App() {
           <div className="flex justify-between">
             <p className='text-blue-500'>Player X</p>
             <p>vs</p>
-            <p className='text-pink-600'>Player O</p>
+            <p className='text-pink-500'>Player O</p>
           </div>
           <div className="flex justify-between text-sm text-neutral-400">
             <p>{XWins} wins</p>
-            <p className={Turn == "X" ? 'text-blue-500' : 'text-pink-600'}>Current turn: {Turn}</p>
+            <p className={Turn == "X" ? 'text-blue-500' : 'text-pink-500'}>Current turn: {Turn}</p>
             <p>{YWins} wins</p>
           </div>
           <p className='!text-2xl text-blue-500'>{isWinningCombination(X) && "X wins!"}</p>
-          <p className='!text-2xl text-pink-600'>{isWinningCombination(Y) && "O wins!"}</p>
+          <p className='!text-2xl text-pink-500'>{isWinningCombination(Y) && "O wins!"}</p>
         </div>
         <table className="table-auto mx-auto w-80 border-separate border-spacing-2 bg-[#1E1E1E] p-2 px-4 rounded-2xl">
 
@@ -233,6 +234,7 @@ function App() {
 
           </tbody>
         </table>
+        <a href='https://github.com/Noureldin-Ahmed-FullStack' target='_blank' className='mt-5 anchorButton hover:!text-white'><span className='flex items-center justify-center'><GitHubIcon className='me-3'/>My Github</span></a>
       </div>
     </>
   )
