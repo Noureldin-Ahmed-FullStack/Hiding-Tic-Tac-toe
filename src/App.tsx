@@ -78,7 +78,7 @@ function App() {
     } else {
       if (YIndex < 3) {
         if (YDanger != 0) {
-          if (YDanger < 3) {
+          if (YDanger < 2) {
             setYDanger(YDanger + 1)
           } else {
             setYDanger(0)
