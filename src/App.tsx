@@ -29,6 +29,38 @@ function CellItem(props: CellItemProps) {
       </p></td>
   )
 }
+function isWinningCombination(
+  positions: { coordinatesX: number | null; coordinatesY: number | null }[]
+) {
+  const filtered = positions.filter(p => p.coordinatesX !== null && p.coordinatesY !== null) as {
+    coordinatesX: number;
+    coordinatesY: number;
+  }[];
+
+  if (filtered.length < 3) return false;
+
+  const rows = filtered.map(p => p.coordinatesY);
+  const cols = filtered.map(p => p.coordinatesX);
+
+  const allSame = (arr: number[]) => arr.every(v => v === arr[0]);
+
+  if (allSame(rows)) return true;
+  if (allSame(cols)) return true;
+
+  const hasMajorDiagonal =
+    filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 0) &&
+    filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
+    filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 2);
+
+  const hasMinorDiagonal =
+    filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 2) &&
+    filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
+    filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 0);
+
+  return hasMajorDiagonal || hasMinorDiagonal;
+}
+
+
 function App() {
   const [X, setX] = useState<item[]>([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
   const [Y, setY] = useState<item[]>([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
@@ -37,7 +69,20 @@ function App() {
   const [XDanger, setXDanger] = useState<number>(0)
   const [YDanger, setYDanger] = useState<number>(0)
   const [Turn, setTurn] = useState("X")
+  const Reset = () => {
+    setXIndex(0)
+    setYIndex(0)
+    setXDanger(0)
+    setYDanger(0)
+    setTurn("X")
+    setX([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
+    setY([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
+  }
   const CellSelected = (item: item) => {
+    if (isWinningCombination(X) || isWinningCombination(Y)) {
+      Reset()
+      return
+    }
     if (X.some(Xdata =>
       JSON.stringify(Xdata) === JSON.stringify(item)
     ) || Y.some(Ydata =>
@@ -109,7 +154,7 @@ function App() {
   return (
     <>
       <div className="flex w-full justify-between">
-        <div className="flex flex-col w-full">
+        {/* <div className="flex flex-col w-full">
           <p>XDanger: {XDanger}</p>
           <p>YDanger: {YDanger}</p>
           <br />
@@ -139,29 +184,36 @@ function App() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
-      <table className="table-auto w-80">
+      <div className="flex flex-col">
+        <div className='text-center mb-5 poppins-regular h-12'>
+          <h1 className='!text-2xl'>Dynamic Tic Tac Toe</h1>
+          <p className='!text-2xl text-blue-500'>{isWinningCombination(X) && "X wins!"}</p>
+          <p className='!text-2xl text-pink-600'>{isWinningCombination(Y) && "Y wins!"}</p>
+        </div>
+        <table className="table-auto mx-auto w-80">
 
-        <tbody className=''>
-          <tr>
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 0 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 0 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 0 }} />
-          </tr>
-          <tr>
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 1 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 1 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 1 }} />
-          </tr>
-          <tr>
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 2 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 2 }} />
-            <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 2 }} />
-          </tr>
+          <tbody>
+            <tr>
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 0 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 0 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 0 }} />
+            </tr>
+            <tr>
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 1 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 1 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 1 }} />
+            </tr>
+            <tr>
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 0, coordinatesY: 2 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 1, coordinatesY: 2 }} />
+              <CellItem XData={X} YData={Y} XDanger={XDanger} YDanger={YDanger} CellSelected={CellSelected} value={{ coordinatesX: 2, coordinatesY: 2 }} />
+            </tr>
 
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </>
   )
 }
