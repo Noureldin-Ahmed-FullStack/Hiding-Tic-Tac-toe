@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
-
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Tooltip } from '@mui/material';
 interface item {
   coordinatesX: number | null
   coordinatesY: number | null
@@ -20,7 +21,7 @@ function CellItem(props: CellItemProps) {
       JSON.stringify(item) === JSON.stringify(value)
     ) ? "text-blue-500" : YData.some(item =>
       JSON.stringify(item) === JSON.stringify(value)
-    ) ? "text-pink-600" : "-") + ' h-28 border border-zinc-400 hover:bg-zinc-700 transition-colors duration-200 cursor-pointer ' + ((((XData[XDanger].coordinatesX == value.coordinatesX && XData[XDanger].coordinatesY == value.coordinatesY) && XData[2].coordinatesX != null) || ((YData[YDanger].coordinatesX == value.coordinatesX && YData[YDanger].coordinatesY == value.coordinatesY) && YData[2].coordinatesX != null)) && "opacity-50")}><p className='poppins-bold text-4xl mx-auto w-7 h-7'>
+    ) ? "text-pink-600" : "-") + ' h-[5.5rem] rounded-2xl bg-neutral-800 hover:bg-zinc-600 transition-colors duration-200 cursor-pointer ' + ((((XData[XDanger].coordinatesX == value.coordinatesX && XData[XDanger].coordinatesY == value.coordinatesY) && XData[2].coordinatesX != null) || ((YData[YDanger].coordinatesX == value.coordinatesX && YData[YDanger].coordinatesY == value.coordinatesY) && YData[2].coordinatesX != null)) && "opacity-50")}><p className='poppins-bold text-4xl mx-auto w-7 h-7'>
         {XData.some(item =>
           JSON.stringify(item) === JSON.stringify(value)
         ) ? "X" : YData.some(item =>
@@ -29,46 +30,45 @@ function CellItem(props: CellItemProps) {
       </p></td>
   )
 }
-function isWinningCombination(
-  positions: { coordinatesX: number | null; coordinatesY: number | null }[]
-) {
-  const filtered = positions.filter(p => p.coordinatesX !== null && p.coordinatesY !== null) as {
-    coordinatesX: number;
-    coordinatesY: number;
-  }[];
-
-  if (filtered.length < 3) return false;
-
-  const rows = filtered.map(p => p.coordinatesY);
-  const cols = filtered.map(p => p.coordinatesX);
-
-  const allSame = (arr: number[]) => arr.every(v => v === arr[0]);
-
-  if (allSame(rows)) return true;
-  if (allSame(cols)) return true;
-
-  const hasMajorDiagonal =
-    filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 0) &&
-    filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
-    filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 2);
-
-  const hasMinorDiagonal =
-    filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 2) &&
-    filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
-    filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 0);
-
-  return hasMajorDiagonal || hasMinorDiagonal;
-}
 
 
 function App() {
   const [X, setX] = useState<item[]>([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
   const [Y, setY] = useState<item[]>([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
   const [XIndex, setXIndex] = useState<number>(0)
+  const [XWins, setXWins] = useState<number>(0)
+  const [YWins, setYWins] = useState<number>(0)
   const [YIndex, setYIndex] = useState<number>(0)
   const [XDanger, setXDanger] = useState<number>(0)
   const [YDanger, setYDanger] = useState<number>(0)
   const [Turn, setTurn] = useState("X")
+  function isWinningCombination(
+    positions: { coordinatesX: number | null; coordinatesY: number | null }[]
+  ) {
+    const filtered = positions.filter(p => p.coordinatesX !== null && p.coordinatesY !== null) as {
+      coordinatesX: number;
+      coordinatesY: number;
+    }[];
+
+    if (filtered.length < 3) return false;
+
+    const rows = filtered.map(p => p.coordinatesY);
+    const cols = filtered.map(p => p.coordinatesX);
+
+    const allSame = (arr: number[]) => arr.every(v => v === arr[0]);
+
+    const hasMajorDiagonal =
+      filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 0) &&
+      filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
+      filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 2);
+
+    const hasMinorDiagonal =
+      filtered.some(p => p.coordinatesX === 0 && p.coordinatesY === 2) &&
+      filtered.some(p => p.coordinatesX === 1 && p.coordinatesY === 1) &&
+      filtered.some(p => p.coordinatesX === 2 && p.coordinatesY === 0);
+
+    return allSame(rows) || allSame(cols) || hasMajorDiagonal || hasMinorDiagonal;
+  }
   const Reset = () => {
     setXIndex(0)
     setYIndex(0)
@@ -78,6 +78,19 @@ function App() {
     setX([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
     setY([{ coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null }, { coordinatesX: null, coordinatesY: null },])
   }
+  useEffect(() => {
+
+    if (Turn == "O" && isWinningCombination(X)) {
+      setXWins(prev => prev + 1);
+      console.log("X wins!");
+    }
+
+    if (Turn == "X" && isWinningCombination(Y)) {
+      setYWins(prev => prev + 1);
+      console.log("O wins!");
+    }
+  }, [X, Y, Turn]); // depends on the arrays changing
+
   const CellSelected = (item: item) => {
     if (isWinningCombination(X) || isWinningCombination(Y)) {
       Reset()
@@ -119,7 +132,7 @@ function App() {
           setXDanger(0)
         }
       }
-      setTurn("Y")
+      setTurn("O")
     } else {
       if (YIndex < 3) {
         if (YDanger != 0) {
@@ -147,9 +160,6 @@ function App() {
       setTurn("X")
     }
 
-
-    console.log(X)
-    console.log(item)
   }
   return (
     <>
@@ -187,12 +197,22 @@ function App() {
         </div> */}
       </div>
       <div className="flex flex-col">
-        <div className='text-center mb-5 poppins-regular h-12'>
-          <h1 className='!text-2xl'>Dynamic Tic Tac Toe</h1>
+        <div className='text-center mb-5 poppins-regular h-32'>
+          <h1 className='!text-2xl mb-2'>Dynamic Tic Tac Toe <Tooltip className='cursor-pointer' title="In this version of Tic Tac Toe, every fourth move deletes the oldest move on the board. This twist keeps the game dynamic, forcing players to rethink strategies as past plays disappear." followCursor><HelpOutlineIcon fontSize="small" /></Tooltip></h1>
+          <div className="flex justify-between">
+            <p className='text-blue-500'>Player X</p>
+            <p>vs</p>
+            <p className='text-pink-600'>Player O</p>
+          </div>
+          <div className="flex justify-between text-sm text-neutral-400">
+            <p>{XWins} wins</p>
+            <p className={Turn == "X" ? 'text-blue-500' : 'text-pink-600'}>Current turn: {Turn}</p>
+            <p>{YWins} wins</p>
+          </div>
           <p className='!text-2xl text-blue-500'>{isWinningCombination(X) && "X wins!"}</p>
-          <p className='!text-2xl text-pink-600'>{isWinningCombination(Y) && "Y wins!"}</p>
+          <p className='!text-2xl text-pink-600'>{isWinningCombination(Y) && "O wins!"}</p>
         </div>
-        <table className="table-auto mx-auto w-80">
+        <table className="table-auto mx-auto w-80 border-separate border-spacing-2 bg-[#1E1E1E] p-2 px-4 rounded-2xl">
 
           <tbody>
             <tr>
