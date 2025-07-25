@@ -210,8 +210,8 @@ function App() {
             <p className={Turn == "X" ? 'text-blue-500' : 'text-pink-500'}>Current turn: {Turn}</p>
             <p>{YWins} wins</p>
           </div>
-          <p className='!text-2xl text-blue-500'>{isWinningCombination(X) && "X wins!"}</p>
-          <p className='!text-2xl text-pink-500'>{isWinningCombination(Y) && "O wins!"}</p>
+          <h2 className='!text-2xl text-blue-500'>{isWinningCombination(X) && "X wins!"}</h2>
+          <h2 className='!text-2xl text-pink-500'>{isWinningCombination(Y) && "O wins!"}</h2>
         </div>
         <table className="table-auto mx-auto w-80 border-separate border-spacing-2 bg-[#1E1E1E] p-2 px-4 rounded-2xl">
 
@@ -234,7 +234,7 @@ function App() {
 
           </tbody>
         </table>
-        <a href='https://github.com/Noureldin-Ahmed-FullStack' target='_blank' className='mt-5 anchorButton hover:!text-white'><span className='flex items-center justify-center'><GitHubIcon className='me-3'/>My Github</span></a>
+        <a href='https://github.com/Noureldin-Ahmed-FullStack' title='Author Github' target='_blank' className='mt-5 anchorButton hover:!text-white'><span className='flex items-center justify-center'><GitHubIcon className='me-3'/>My Github</span></a>
       </div>
     </>
   )
